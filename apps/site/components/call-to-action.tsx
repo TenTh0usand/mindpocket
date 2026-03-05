@@ -11,10 +11,10 @@ export default function CallToAction() {
   const { t } = useSiteI18n()
 
   return (
-    <section className="py-16">
+    <section className="py-16 md:py-32">
       <div className="mx-auto max-w-5xl rounded-3xl border px-6 py-12 md:py-20 lg:py-32">
         <div className="text-center">
-          <h2 className="text-balance text-4xl font-semibold lg:text-5xl">{t.cta.title}</h2>
+          <h2 className="text-balance text-4xl font-medium lg:text-5xl">{t.cta.title}</h2>
           <p className="mt-4">{t.cta.subtitle}</p>
 
           <div className="mt-12 flex flex-wrap justify-center gap-4">
