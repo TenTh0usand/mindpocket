@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "tsx scripts/ensure-extensions.ts && drizzle-kit push --force && next build",
+    "build": "pnpm db:bootstrap && next build",
+    "db:bootstrap": "tsx scripts/ensure-extensions.ts && drizzle-kit push --force",
     "build-without-db": "next build",
     "start": "next start",
     "lint": "biome lint .",
