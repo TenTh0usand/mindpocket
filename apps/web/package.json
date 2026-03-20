@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "pnpm --filter @repo/types build && pnpm db:bootstrap && next build",
+    "build:vercel": "node scripts/vercel-build.mjs",
     "db:bootstrap": "tsx scripts/ensure-extensions.ts && drizzle-kit push --force",
-    "build-without-db": "next build",
+    "build-without-db": "pnpm --filter @repo/types build && next build",
     "start": "next start",
     "lint": "biome lint .",
     "db:generate": "drizzle-kit generate",

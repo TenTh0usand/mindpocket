@@ -8,11 +8,21 @@ import { count } from "drizzle-orm"
 import { db } from "@/db/client"
 import { user as userTable } from "@/db/schema/auth"
 
+const appUrl =
+  process.env.BETTER_AUTH_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://127.0.0.1:3000")
+
+const authSecret =
+  process.env.BETTER_AUTH_SECRET ||
+  (process.env.VERCEL_URL ? `${process.env.VERCEL_URL}-preview-secret-fallback` : undefined) ||
+  "local-development-secret-local-development-secret"
+
 export const auth = betterAuth({
-  baseURL:
-    process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://127.0.0.1:3000",
+  baseURL: appUrl,
+  secret: authSecret,
   trustedOrigins: [
-    process.env.NEXT_PUBLIC_APP_URL || "http://127.0.0.1:3000",
+    appUrl,
     "chrome-extension://*",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8081",
@@ -27,7 +37,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     async sendResetPassword(_data, _request) {
-      // Send an email to the user with a link to reset their password
+      // Send an email to the user with a link to reset their password.
     },
   },
   // socialProviders: {
@@ -46,9 +56,10 @@ export const auth = betterAuth({
         before: async () => {
           const result = await db.select({ count: count() }).from(userTable)
           const userCount = result[0]?.count || 0
+
           if (userCount > 0) {
             throw new APIError("FORBIDDEN", {
-              message: "注册已关闭",
+              message: "Registration is closed.",
             })
           }
         },
