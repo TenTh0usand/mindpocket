@@ -1,6 +1,7 @@
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
+import { findUserIdByApiToken } from "@/lib/api-token"
 import { resolveFolderForIngest } from "@/lib/ingest/auto-folder"
 import { ingestFromExtension, ingestFromFile, ingestFromUrl } from "@/lib/ingest/pipeline"
 import { ingestExtensionSchema, ingestUrlSchema } from "@/lib/ingest/types"
@@ -33,12 +34,10 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024
 const FILE_EXT_REGEX = /\.[^.]+$/
 
 export async function POST(request: Request) {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) {
+  const userId = await resolveAuthorizedUserId(request)
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
-
-  const userId = session.user.id
   const contentType = request.headers.get("content-type") ?? ""
 
   try {
@@ -51,6 +50,19 @@ export async function POST(request: Request) {
     console.error("[ingest] Unexpected error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
+}
+
+async function resolveAuthorizedUserId(request: Request) {
+  const authorization = request.headers.get("authorization")
+  if (authorization?.startsWith("Bearer ")) {
+    const token = authorization.slice("Bearer ".length).trim()
+    if (token) {
+      return findUserIdByApiToken(token)
+    }
+  }
+
+  const session = await auth.api.getSession({ headers: await headers() })
+  return session?.user?.id ?? null
 }
 
 async function handleJsonIngest(request: Request, userId: string) {

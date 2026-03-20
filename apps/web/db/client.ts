@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless"
 import { drizzle } from "drizzle-orm/neon-http"
+import { apiToken, apiTokenRelations } from "./schema/api-token"
 import { userAiProvider, userAiProviderRelations } from "./schema/ai-provider"
 import {
   account,
@@ -17,6 +18,8 @@ import { folder, folderRelations } from "./schema/folder"
 import { bookmarkTag, bookmarkTagRelations, tag, tagRelations } from "./schema/tag"
 
 const schema = {
+  apiToken,
+  apiTokenRelations,
   user,
   session,
   account,
